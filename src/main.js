@@ -14,7 +14,6 @@ import 'babel-polyfill';
 import {
   getAuthData
 } from 'components/utils';
-
 Vue.use(Mint)
 Vue.use(VueResource);
 

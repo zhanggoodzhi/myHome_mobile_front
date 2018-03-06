@@ -44,8 +44,7 @@ export default {
         response => {
           if (response.body.success) {
             Toast({
-              message: response.body.message,
-              iconClass: "icon icon-success"
+              message: response.body.message
             });
             const authData = {};
             Object.keys(response.body).forEach(v => {

@@ -1,8 +1,7 @@
 <template>
-    <ul>
+   <ul>
         <li class="item" v-for="(item,index) in logs" :key="index">
-            <el-tag type="warning" class="date-tag">{{item.date}}</el-tag>
-            <el-tag class="text-tag">{{item.text}}</el-tag>
+            <mt-cell :title="item.text" :label="item.date"></mt-cell>
         </li>
     </ul>
 </template>
@@ -20,22 +19,15 @@ export default {
   }
 };
 </script>
-<style lang="less" scoped>
-   .item{
-       padding: 5px;
-       .date-tag{
-           border-top-right-radius:0; 
-           border-bottom-right-radius:0; 
-       }
-       .text-tag{
-           border-top-left-radius:0; 
-           border-bottom-left-radius:0; 
-           margin-left:-5px; 
-           max-width: 1000px;
-           text-overflow: ellipsis;
-           overflow: hidden;
-           white-space: nowrap;
-           vertical-align: bottom;
-       }
-   }
+<style lang="less">
+.item {
+  border-bottom: 1px solid #eee;
+  &:last-child {
+    border: 0;
+  }
+  .mint-cell-text {
+    font-size: 14px;
+    color: #606266;
+  }
+}
 </style>

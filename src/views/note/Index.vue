@@ -1,48 +1,29 @@
 <template>
-  <div>
-    <div class="search-wrap">
-      <el-input class="keyword" v-model="keyword" placeholder="请输入留言关键字"></el-input>
-      <el-button type="primary" icon="el-icon-search" @click="handleSearch()"></el-button>
-      <el-button class="add" type="success" icon="el-icon-plus" @click="handleAdd()">新增留言</el-button>
-    </div>
-    <div class="table-wrap">
-      <el-table :data="tableData" style="width: 100%">
-        <el-table-column prop="title" label="标题">
-        </el-table-column>
-        <el-table-column prop="content" label="留言内容">
-        </el-table-column>
-        <el-table-column prop="date" label="更新日期">
-        </el-table-column>
-        <el-table-column label="操作">
-          <template slot-scope="scope">
-            <el-button size="mini" type="primary" @click="handleEdit(scope.row)">编辑</el-button>
-            <el-button size="mini" type="danger" @click="handleDelete(scope.row)">删除</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-    </div>
-    <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" width="30%" @close="clearModal()">
-      <el-form ref="form" :model="data" :rules="rules" label-width="100px">
-        <el-form-item label="标题" prop="title">
-          <el-input v-model="data.title"></el-input>
-        </el-form-item>
-        <el-form-item label="留言内容" prop="content">
-          <el-input v-model="data.content"></el-input>
-        </el-form-item>
-      </el-form>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="save()">确 定</el-button>
-      </span>
-    </el-dialog>
+  <div class="router-content">
+    <ul>
+      <li class="item" v-for="(item,index) in tableData" :key="index" @click="handleEdit(item)">
+        <mt-cell :title="item.title" :value="item.content" :label="item.date"></mt-cell>
+      </li>
+    </ul>
+    <mt-button class="add-btn" type="primary" @click="handleAdd">+</mt-button>
+    <mt-popup v-model="dialogVisible" position="bottom">
+      <div class="pop-content">
+        <mt-header :title="dialogTitle">
+          <mt-button slot="right" @click="save">
+            完成
+          </mt-button>
+        </mt-header>
+        <div class="form">
+          <mt-field label="标题" placeholder="请输入标题" type="text" v-model="data.title"></mt-field>
+          <mt-field label="内容" placeholder="请输入内容" type="textarea" rows="4" v-model="data.content"></mt-field>
+        </div>
+      </div>
+    </mt-popup>
   </div>
 </template>
 <script>
 import moment from "moment";
-import { createNamespacedHelpers } from "vuex";
-import { ceshi } from "components/ceshi";
-var a=ceshi();
-const { mapMutations } = createNamespacedHelpers("noteBadge");
+import { Toast } from "mint-ui";
 export default {
   data() {
     return {
@@ -53,12 +34,6 @@ export default {
         title: "",
         content: ""
       },
-      rules: {
-        title: [{ required: true, message: "请输入标题", trigger: "blur" }],
-        content: [
-          { required: true, message: "请输入留言内容", trigger: "blur" }
-        ]
-      },
       currentId: "",
       tableData: []
     };
@@ -67,7 +42,6 @@ export default {
     this.reload();
   },
   methods: {
-    ...mapMutations(['add','init','reduce']),
     handleSearch() {
       this.reload();
     },
@@ -78,10 +52,10 @@ export default {
     handleEdit(row) {
       this.dialogTitle = "编辑留言";
       this.dialogVisible = true;
-      setTimeout(()=>{
+      setTimeout(() => {
         this.data.title = row.title;
         this.data.content = row.content;
-      },0);
+      }, 0);
       this.currentId = row._id;
     },
     handleDelete(row) {
@@ -119,61 +93,66 @@ export default {
       });
     },
     save() {
-      this.$refs.form.validate(result => {
-        if (result) {
-          // 验证通过,调用module里的setUserInfo方法
-          const currentDate = moment().format("YYYY-MM-DD HH:mm:ss");
-          const sendData = {
-            ...this.data,
-            date: currentDate
-          };
-          if (this.dialogTitle == "新增留言") {
-            this.$http.post("api/addNote", sendData).then(
-              response => {
-                // get body data
-                this.dialogVisible = false;
-                this.keyword = "";
-                this.$message({
-                  type: "success",
-                  message: response.body.message
-                });
-                this.reload();
-                this.add();
-              },
-              response => {
-                // error callback
-                this.$message.error({
-                  message: "出现错误"
-                });
-              }
-            );
-          } else {
-            this.$http
-              .post("api/updateNote", {
-                ...sendData,
-                id: this.currentId
-              })
-              .then(
-                response => {
-                  // get body data
-                  this.dialogVisible = false;
-                  this.keyword = "";
-                  this.$message({
-                    type: "success",
-                    message: response.body.message
-                  });
-                  this.reload();
-                },
-                response => {
-                  // error callback
-                  this.$message.error({
-                    message: "出现错误"
-                  });
-                }
-              );
+      if (this.data.title.trim() === "") {
+        Toast({
+          message: "请输入标题"
+        });
+        return;
+      }
+      if (this.data.content.trim() === "") {
+        Toast({
+          message: "请输入内容"
+        });
+        return;
+      }
+      // 验证通过,调用module里的setUserInfo方法
+      const currentDate = moment().format("YYYY-MM-DD HH:mm:ss");
+      const sendData = {
+        ...this.data,
+        date: currentDate
+      };
+      if (this.dialogTitle == "新增留言") {
+        this.$http.post("api/addNote", sendData).then(
+          response => {
+            // get body data
+            this.dialogVisible = false;
+            this.keyword = "";
+            Toast({
+              message: response.body.message
+            });
+            this.reload();
+          },
+          response => {
+            // error callback
+            Toast({
+              message: "出现错误"
+            });
           }
-        }
-      });
+        );
+      } else {
+        this.$http
+          .post("api/updateNote", {
+            ...sendData,
+            id: this.currentId
+          })
+          .then(
+            response => {
+              // get body data
+              this.dialogVisible = false;
+              this.keyword = "";
+              Toast({
+                message: response.body.message
+              });
+              this.reload();
+            },
+            response => {
+              // error callback
+              Toast({
+                message: "出现错误"
+              });
+            }
+          );
+      }
     },
     clearModal() {
       this.$refs.form.resetFields();
@@ -182,17 +161,30 @@ export default {
 };
 </script>
 <style lang="less" scoped>
-.keyword {
-  width: 200px;
-}
-
-.search-wrap {
-  .add {
-    float: right;
+.item {
+  border-bottom: 1px solid #eee;
+  &:last-child {
+    border: 0;
   }
 }
 
-.table-wrap {
-  margin-top: 20px;
+.add-btn {
+  border-radius: 50%;
+  width: 1.3rem;
+  height: 1.3rem;
+  font-size: 25px;
+  position: absolute;
+  bottom: 0.2rem;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.router-content {
+  height: 100%;
+}
+
+.pop-content {
+  width: 100vw;
+  height: 100vh;
 }
 </style>

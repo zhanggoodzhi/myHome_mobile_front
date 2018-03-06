@@ -9,7 +9,7 @@
 
 </script>
 
-<style lang="less" scope>
+<style lang="less">
   html {
     // background: #eee;
     body {
@@ -21,5 +21,11 @@
     margin: 0;
     padding: 0;
     overflow: hidden;
+  }
+  .page{
+    height: 100vh;
+  }
+  .mint-toast{
+    z-index: 99999;
   }
 </style>

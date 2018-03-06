@@ -8,15 +8,20 @@ export default new Router({
   routes: [{
     path: '/',
     component: resolve => require.ensure([], () => resolve(require('../views/layout')), 'layout'),
-    children: [
-      {
+    children: [{
         path: '/home',
-        component: resolve => require.ensure([], () => resolve(require('../views/home')),'home')
+        meta: {
+          name: '首页'
+        },
+        component: resolve => require.ensure([], () => resolve(require('../views/home')), 'home')
+      }, {
+        path: '/note',
+        meta: {
+          name: '留言'
+        },
+        component: resolve => require.ensure([], () => resolve(require('../views/note')), 'note')
       }
       // , {
-      //   path: '/note',
-      //   component: resolve => require.ensure([], () => resolve(require('../views/note')),'note')
-      // }, {
       //   path: '/game',
       //   component: resolve => require.ensure([], () => resolve(require('../views/game')),'game')
       // }, {
