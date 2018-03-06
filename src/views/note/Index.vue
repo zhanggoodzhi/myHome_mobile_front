@@ -1,14 +1,17 @@
 <template>
-  <div class="router-content">
+  <div class="router-content note">
     <ul>
-      <li class="item" v-for="(item,index) in tableData" :key="index" @click="handleEdit(item)">
+      <li class="item" v-for="(item,index) in tableData" :key="index" v-finger:long-tap="press.bind(this,item)">
         <mt-cell :title="item.title" :value="item.content" :label="item.date"></mt-cell>
       </li>
     </ul>
     <mt-button class="add-btn" type="primary" @click="handleAdd">+</mt-button>
+    <mt-actionsheet class="" :actions="actions" v-model="sheetVisible">
+    </mt-actionsheet>
     <mt-popup v-model="dialogVisible" position="bottom">
       <div class="pop-content">
         <mt-header :title="dialogTitle">
+          <mt-button icon="back" slot="left" @click="hideModal()"></mt-button>
           <mt-button slot="right" @click="save">
             完成
           </mt-button>
@@ -23,25 +26,44 @@
 </template>
 <script>
 import moment from "moment";
-import { Toast } from "mint-ui";
+import { Toast, MessageBox } from "mint-ui";
 export default {
   data() {
     return {
       keyword: "",
+      sheetVisible: false,
       dialogTitle: "新增留言",
       dialogVisible: false,
       data: {
         title: "",
         content: ""
       },
-      currentId: "",
-      tableData: []
+      currentRow: null,
+      tableData: [],
+      actions: [
+        {
+          name: "删除",
+          method: () => {
+            this.handleDelete(this.currentRow._id);
+          }
+        },
+        {
+          name: "编辑",
+          method: () => {
+            this.handleEdit(this.currentRow);
+          }
+        }
+      ]
     };
   },
   created() {
     this.reload();
   },
   methods: {
+    press(row) {
+      this.sheetVisible = true;
+      this.currentRow = row;
+    },
     handleSearch() {
       this.reload();
     },
@@ -56,31 +78,25 @@ export default {
         this.data.title = row.title;
         this.data.content = row.content;
       }, 0);
-      this.currentId = row._id;
     },
-    handleDelete(row) {
-      this.$confirm("确定要删除该留言吗?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).then(() => {
+    handleDelete(id) {
+      MessageBox.confirm("确定要删除该留言吗?").then(() => {
         this.$http
           .post("api/deleteNote", {
-            id: row._id
+            id
           })
           .then(
             response => {
               // get body data
-              this.$message({
-                type: "success",
+              console.log("删除成功", id);
+              this.reload();
+              Toast({
                 message: response.body.message
               });
-              this.reload();
-              this.reduce();
             },
             response => {
               // error callback
-              this.$message.error({
+              Toast({
                 message: "出现错误"
               });
             }
@@ -89,6 +105,8 @@ export default {
     },
     reload() {
       this.$http.get(`api/getNotes?keyword=${this.keyword}`).then(response => {
+        console.log(response.body);
+        alert(response.body.map((v)=>{return v.title}).join(','));
         this.tableData = response.body;
       });
     },
@@ -115,12 +133,12 @@ export default {
         this.$http.post("api/addNote", sendData).then(
           response => {
             // get body data
-            this.dialogVisible = false;
+            this.hideModal();
             this.keyword = "";
+            this.reload();
             Toast({
               message: response.body.message
             });
-            this.reload();
           },
           response => {
             // error callback
@@ -133,17 +151,17 @@ export default {
         this.$http
           .post("api/updateNote", {
             ...sendData,
-            id: this.currentId
+            id: this.currentRow._id
           })
           .then(
             response => {
               // get body data
-              this.dialogVisible = false;
+              this.hideModal();
               this.keyword = "";
+              this.reload();
               Toast({
                 message: response.body.message
               });
-              this.reload();
             },
             response => {
               // error callback
@@ -154,20 +172,20 @@ export default {
           );
       }
     },
+    hideModal() {
+      this.dialogVisible = false;
+      this.clearModal();
+    },
     clearModal() {
-      this.$refs.form.resetFields();
+      this.data = {
+        title: "",
+        content: ""
+      };
     }
   }
 };
 </script>
-<style lang="less" scoped>
-.item {
-  border-bottom: 1px solid #eee;
-  &:last-child {
-    border: 0;
-  }
-}
-
+<style lang="less">
 .add-btn {
   border-radius: 50%;
   width: 1.3rem;
@@ -181,6 +199,12 @@ export default {
 
 .router-content {
   height: 100%;
+}
+
+.note {
+  .mint-actionsheet-listitem:first-child {
+    color: #ef4f4f;
+  }
 }
 
 .pop-content {

@@ -14,9 +14,6 @@
             <mt-cell title="留言" is-link to="note"></mt-cell>
           </div>
           <div class="menu-item">
-            <mt-cell title="游戏分享" is-link></mt-cell>
-          </div>
-          <div class="menu-item">
             <mt-cell title="用户管理" is-link></mt-cell>
           </div>
         </div>

@@ -4,6 +4,8 @@ import Vue from 'vue'
 import App from './App'
 // import ElementUI from 'element-ui'
 import Mint from 'mint-ui';
+import AlloyFinger from 'alloyfinger';
+import AlloyFingerPlugin from 'alloyfinger/vue/alloy_finger.vue'
 import 'animate.css/animate.css';
 // import 'element-ui/lib/theme-chalk/index.css';
 import 'mint-ui/lib/style.css'
@@ -15,6 +17,9 @@ import {
   getAuthData
 } from 'components/utils';
 Vue.use(Mint)
+Vue.use(AlloyFingerPlugin, {
+  AlloyFinger
+})
 Vue.use(VueResource);
 
 Vue.config.productionTip = false;
@@ -24,7 +29,13 @@ Vue
   .push(function (request, next) {
     request
       .headers
-      .set('Authorization', getAuthData() && getAuthData().token);
+      .set('Authorization', getAuthData() && getAuthData().token)
+    request
+      .headers.set('Cache-Control', 'no-cache')
+    request
+      .headers.set('Pragma', 'no-cache ')
+    request
+      .headers.set('Expires', 'Thu, 01 Dec 1994 16:00:00 GMT')
     // continue to next interceptor
     next(function (response) {
       if (response.status === 403) {
@@ -56,4 +67,3 @@ function callback() {
 
 document.addEventListener('DOMContentLoaded', callback);
 window.addEventListener('orientationchange' in window ? 'orientationchange' : 'resize', callback);
-

@@ -21,10 +21,6 @@ export default {
 </script>
 <style lang="less">
 .item {
-  border-bottom: 1px solid #eee;
-  &:last-child {
-    border: 0;
-  }
   .mint-cell-text {
     font-size: 14px;
     color: #606266;
