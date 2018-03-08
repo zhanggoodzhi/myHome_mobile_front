@@ -105,8 +105,6 @@ export default {
     },
     reload() {
       this.$http.get(`api/getNotes?keyword=${this.keyword}`).then(response => {
-        console.log(response.body);
-        alert(response.body.map((v)=>{return v.title}).join(','));
         this.tableData = response.body;
       });
     },

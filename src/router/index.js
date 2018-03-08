@@ -7,28 +7,24 @@ export default new Router({
   mode: 'history',
   routes: [{
     path: '/',
+    redirect: '/home',
     component: resolve => require.ensure([], () => resolve(require('../views/layout')), 'layout'),
     children: [{
-        path: '/home',
-        meta: {
-          name: '首页'
-        },
-        component: resolve => require.ensure([], () => resolve(require('../views/home')), 'home')
-      }, {
-        path: '/note',
-        meta: {
-          name: '留言'
-        },
-        component: resolve => require.ensure([], () => resolve(require('../views/note')), 'note')
-      }
-      // , {
-      //   path: '/game',
-      //   component: resolve => require.ensure([], () => resolve(require('../views/game')),'game')
-      // }, {
-      //   path: '/user',
-      //   component: resolve => require.ensure([], () => resolve(require('../views/user')),'user')
-      // }
-    ]
+      path: '/home',
+      meta: {
+        name: '首页'
+      },
+      component: resolve => require.ensure([], () => resolve(require('../views/home')), 'home')
+    }, {
+      path: '/note',
+      meta: {
+        name: '留言'
+      },
+      component: resolve => require.ensure([], () => resolve(require('../views/note')), 'note')
+    }, {
+      path: '/user',
+      component: resolve => require.ensure([], () => resolve(require('../views/user')), 'user')
+    }]
   }, {
     path: '/login',
     component: resolve => require.ensure([], () => resolve(require('../views/login')), 'login')

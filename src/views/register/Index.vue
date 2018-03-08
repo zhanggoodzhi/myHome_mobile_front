@@ -4,7 +4,7 @@
     <mt-field label="昵称" placeholder="请输入昵称" v-model="alias"></mt-field>
     <mt-field label="密码" placeholder="请输入密码" type="password" v-model="psd"></mt-field>
     <mt-field label="确认密码" placeholder="请再次输入密码" type="password" v-model="rePsd" @keyup.enter.native="onCreate"></mt-field>
-    <mt-button class="button" type="primary">注册并登录</mt-button>
+    <mt-button class="button" type="primary" @click="onCreate">注册并登录</mt-button>
   </div>
 </template>
 <script>

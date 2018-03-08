@@ -13,8 +13,8 @@
           <div class="menu-item">
             <mt-cell title="留言" is-link to="note"></mt-cell>
           </div>
-          <div class="menu-item">
-            <mt-cell title="用户管理" is-link></mt-cell>
+          <div class="menu-item" v-show="isAdmin">
+            <mt-cell title="用户管理" is-link to="user"></mt-cell>
           </div>
         </div>
         <div class="exit">
@@ -36,7 +36,7 @@
 </template>
 <script>
 import { getAuthData } from "components/utils";
-
+import { Toast, MessageBox } from "mint-ui";
 export default {
   data() {
     return {
